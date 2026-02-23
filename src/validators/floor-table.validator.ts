@@ -13,31 +13,31 @@ const tableShape = z.enum(TABLE_SHAPES);
 
 // ─── Param schemas ────────────────────────────────────────────────────────────
 
-export const BranchIdParams = z.object({
+const BranchIdParams = z.object({
   branchId: nonEmptyString,
 });
 
-export const FloorIdParams = z.object({
+const FloorIdParams = z.object({
   floorId: nonEmptyString,
 });
 
-export const TableIdParams = z.object({
+const TableIdParams = z.object({
   tableId: nonEmptyString,
 });
 
 // ─── Body schemas ─────────────────────────────────────────────────────────────
 
-export const CreateFloorBody = z.object({
+const CreateFloorBody = z.object({
   displayOrder: integer,
   name: nonEmptyString,
 });
 
-export const UpdateFloorBody = z.object({
+const UpdateFloorBody = z.object({
   displayOrder: integer.optional(),
   name: nonEmptyString.optional(),
 });
 
-export const ReorderFloorsBody = z.object({
+const ReorderFloorsBody = z.object({
   items: z
     .array(
       z.object({
@@ -48,7 +48,7 @@ export const ReorderFloorsBody = z.object({
     .min(1),
 });
 
-export const CreateTableBody = z.object({
+const CreateTableBody = z.object({
   branchId: nonEmptyString,
   posX: integer,
   posY: integer,
@@ -57,7 +57,7 @@ export const CreateTableBody = z.object({
   tableNumber: integer,
 });
 
-export const UpdateTableBody = z.object({
+const UpdateTableBody = z.object({
   branchId: nonEmptyString.optional(),
   floorId: nonEmptyString.optional(),
   posX: integer.optional(),
@@ -67,11 +67,11 @@ export const UpdateTableBody = z.object({
   tableNumber: integer.optional(),
 });
 
-export const UpdateTableStatusBody = z.object({
+const UpdateTableStatusBody = z.object({
   status: tableStatus,
 });
 
-export const UpdateFloorLayoutBody = z.object({
+const UpdateFloorLayoutBody = z.object({
   items: z
     .array(
       z.object({
@@ -98,23 +98,6 @@ export type TUpdateTableStatusBody = z.infer<typeof UpdateTableStatusBody>;
 export type TUpdateFloorLayoutBody = z.infer<typeof UpdateFloorLayoutBody>;
 
 // ─── Controller type map (for route-level type intellisense) ──────────────────
-
-// export type TAdminFloorTableController = {
-//   createFloor: [params: TBranchIdParams, body: TCreateFloorBody];
-//   deleteFloor: [params: TFloorIdParams];
-//   deleteTable: [params: TTableIdParams];
-//   getFloorById: [params: TFloorIdParams];
-//   getFloorsByBranch: [params: TBranchIdParams];
-//   getTableById: [params: TTableIdParams];
-//   getTablesByFloor: [params: TFloorIdParams];
-//   reorderFloors: [params: TBranchIdParams, body: TReorderFloorsBody];
-//   updateFloor: [params: TFloorIdParams, body: TUpdateFloorBody];
-//   updateFloorLayout: [params: TFloorIdParams, body: TUpdateFloorLayoutBody];
-//   updateTable: [params: TTableIdParams, body: TUpdateTableBody];
-//   updateTableStatus: [params: TTableIdParams, body: TUpdateTableStatusBody];
-// };
-
-// ─── Middleware validators ────────────────────────────────────────────────────
 
 export const validateBranchIdParams = validate(
   { params: BranchIdParams },
@@ -186,6 +169,19 @@ export const validateUpdateFloorLayout = validate(
   },
   onValidationError,
 );
+
+export const floorTableValidator = {
+  validateBranchIdParams,
+  validateFloorIdParams,
+  validateTableIdParams,
+  validateCreateFloor,
+  validateUpdateFloor,
+  validateReorderFloors,
+  validateCreateTable,
+  validateUpdateTable,
+  validateUpdateTableStatus,
+  validateUpdateFloorLayout,
+};
 
 export type TAdminFloorTableController = {
   createFloor: typeof validateCreateFloor;

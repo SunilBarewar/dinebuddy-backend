@@ -1,3 +1,4 @@
+import httpStatus from "http-status";
 import { HttpError } from "@/exceptions/http-error";
 import { Repository } from "@/repository";
 import type {
@@ -20,7 +21,7 @@ export class FloorTableService {
     const branch = await this.repository.floorTable.findBranchById(branchId);
 
     if (!branch) {
-      throw new HttpError(404, "Branch not found");
+      throw new HttpError(httpStatus.NOT_FOUND, "Branch not found");
     }
   }
 
@@ -28,7 +29,7 @@ export class FloorTableService {
     const floor = await this.repository.floorTable.findFloorById(floorId);
 
     if (!floor) {
-      throw new HttpError(404, "Floor not found");
+      throw new HttpError(httpStatus.NOT_FOUND, "Floor not found");
     }
   }
 
@@ -39,11 +40,14 @@ export class FloorTableService {
     const floor = await this.repository.floorTable.findFloorById(floorId);
 
     if (!floor) {
-      throw new HttpError(404, "Floor not found");
+      throw new HttpError(httpStatus.NOT_FOUND, "Floor not found");
     }
 
     if (floor.branchId !== branchId) {
-      throw new HttpError(400, "Floor does not belong to the provided branch");
+      throw new HttpError(
+        httpStatus.BAD_REQUEST,
+        "Floor does not belong to the provided branch",
+      );
     }
   }
 
@@ -51,7 +55,7 @@ export class FloorTableService {
     const table = await this.repository.floorTable.findTableById(tableId);
 
     if (!table) {
-      throw new HttpError(404, "Table not found");
+      throw new HttpError(httpStatus.NOT_FOUND, "Table not found");
     }
   }
 
@@ -111,7 +115,10 @@ export class FloorTableService {
     await this.assertBranchExists(branchId);
 
     if (input.length === 0) {
-      throw new HttpError(400, "At least one floor reorder item is required");
+      throw new HttpError(
+        httpStatus.BAD_REQUEST,
+        "At least one floor reorder item is required",
+      );
     }
 
     await this.repository.floorTable.reorderFloors(branchId, input);
@@ -126,11 +133,11 @@ export class FloorTableService {
     await this.assertFloorBelongsToBranch(input.floorId, input.branchId);
 
     if (!this.validateTableStatus(input.status)) {
-      throw new HttpError(400, "Invalid table status");
+      throw new HttpError(httpStatus.BAD_REQUEST, "Invalid table status");
     }
 
     if (!this.validateTableShape(input.shape)) {
-      throw new HttpError(400, "Invalid table shape");
+      throw new HttpError(httpStatus.BAD_REQUEST, "Invalid table shape");
     }
 
     return this.repository.floorTable.createTable(input);
@@ -152,11 +159,11 @@ export class FloorTableService {
     await this.assertTableExists(tableId);
 
     if (input.status && !this.validateTableStatus(input.status)) {
-      throw new HttpError(400, "Invalid table status");
+      throw new HttpError(httpStatus.BAD_REQUEST, "Invalid table status");
     }
 
     if (input.shape && !this.validateTableShape(input.shape)) {
-      throw new HttpError(400, "Invalid table shape");
+      throw new HttpError(httpStatus.BAD_REQUEST, "Invalid table shape");
     }
 
     if (input.branchId && input.floorId) {
@@ -174,7 +181,7 @@ export class FloorTableService {
 
   public async updateTableStatus(tableId: string, status: string) {
     if (!this.validateTableStatus(status)) {
-      throw new HttpError(400, "Invalid table status");
+      throw new HttpError(httpStatus.BAD_REQUEST, "Invalid table status");
     }
 
     await this.assertTableExists(tableId);
@@ -186,7 +193,10 @@ export class FloorTableService {
     await this.assertFloorExists(floorId);
 
     if (input.length === 0) {
-      throw new HttpError(400, "At least one layout update item is required");
+      throw new HttpError(
+        httpStatus.BAD_REQUEST,
+        "At least one layout update item is required",
+      );
     }
 
     await this.repository.floorTable.updateTablesLayout(floorId, input);

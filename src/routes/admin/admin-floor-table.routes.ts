@@ -2,18 +2,7 @@ import { Router } from "express";
 
 import { AdminFloorTableController } from "@/controllers/floor-table/admin-floor-table.controller";
 import { asyncHandler } from "@/utils/async-handler";
-import {
-  validateBranchIdParams,
-  validateCreateFloor,
-  validateCreateTable,
-  validateFloorIdParams,
-  validateReorderFloors,
-  validateTableIdParams,
-  validateUpdateFloor,
-  validateUpdateFloorLayout,
-  validateUpdateTable,
-  validateUpdateTableStatus,
-} from "@/validators/floor-table.validator";
+import { floorTableValidator } from "@/validators/floor-table.validator";
 
 const router = Router();
 
@@ -21,68 +10,68 @@ const adminController = AdminFloorTableController.getInstance();
 
 router.post(
   "/branches/:branchId/floors",
-  validateCreateFloor,
+  floorTableValidator.validateCreateFloor,
   asyncHandler(adminController.createFloor),
 );
 router.get(
   "/branches/:branchId/floors",
-  validateBranchIdParams,
+  floorTableValidator.validateBranchIdParams,
   asyncHandler(adminController.getFloorsByBranch),
 );
 router.get(
   "/floors/:floorId",
-  validateFloorIdParams,
+  floorTableValidator.validateFloorIdParams,
   asyncHandler(adminController.getFloorById),
 );
 router.patch(
   "/floors/:floorId",
-  validateUpdateFloor,
+  floorTableValidator.validateUpdateFloor,
   asyncHandler(adminController.updateFloor),
 );
 router.delete(
   "/floors/:floorId",
-  validateFloorIdParams,
+  floorTableValidator.validateFloorIdParams,
   asyncHandler(adminController.deleteFloor),
 );
 router.patch(
   "/branches/:branchId/floors/reorder",
-  validateReorderFloors,
+  floorTableValidator.validateReorderFloors,
   asyncHandler(adminController.reorderFloors),
 );
 
 router.post(
   "/floors/:floorId/tables",
-  validateCreateTable,
+  floorTableValidator.validateCreateTable,
   asyncHandler(adminController.createTable),
 );
 router.get(
   "/floors/:floorId/tables",
-  validateFloorIdParams,
+  floorTableValidator.validateFloorIdParams,
   asyncHandler(adminController.getTablesByFloor),
 );
 router.get(
   "/tables/:tableId",
-  validateTableIdParams,
+  floorTableValidator.validateTableIdParams,
   asyncHandler(adminController.getTableById),
 );
 router.patch(
   "/tables/:tableId",
-  validateUpdateTable,
+  floorTableValidator.validateUpdateTable,
   asyncHandler(adminController.updateTable),
 );
 router.delete(
   "/tables/:tableId",
-  validateTableIdParams,
+  floorTableValidator.validateTableIdParams,
   asyncHandler(adminController.deleteTable),
 );
 router.patch(
   "/tables/:tableId/status",
-  validateUpdateTableStatus,
+  floorTableValidator.validateUpdateTableStatus,
   asyncHandler(adminController.updateTableStatus),
 );
 router.patch(
   "/floors/:floorId/tables/layout",
-  validateUpdateFloorLayout,
+  floorTableValidator.validateUpdateFloorLayout,
   asyncHandler(adminController.updateFloorLayout),
 );
 

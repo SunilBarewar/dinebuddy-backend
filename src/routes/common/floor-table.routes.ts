@@ -2,12 +2,7 @@ import { Router } from "express";
 
 import { FloorTableController } from "@/controllers/floor-table";
 import { asyncHandler } from "@/utils/async-handler";
-import {
-  validateBranchIdParams,
-  validateFloorIdParams,
-  validateTableIdParams,
-  validateUpdateTableStatus,
-} from "@/validators/floor-table.validator";
+import { floorTableValidator } from "@/validators/floor-table.validator";
 
 const router = Router();
 
@@ -15,32 +10,32 @@ const controller = FloorTableController.getInstance();
 
 router.get(
   "/branches/:branchId/floors",
-  validateBranchIdParams,
+  floorTableValidator.validateBranchIdParams,
   asyncHandler(controller.getFloorsByBranch),
 );
 router.get(
   "/floors/:floorId/tables",
-  validateFloorIdParams,
+  floorTableValidator.validateFloorIdParams,
   asyncHandler(controller.getTablesByFloor),
 );
 router.get(
   "/branches/:branchId/floor-plan",
-  validateBranchIdParams,
+  floorTableValidator.validateBranchIdParams,
   asyncHandler(controller.getBranchFloorPlan),
 );
 router.get(
   "/tables/:tableId",
-  validateTableIdParams,
+  floorTableValidator.validateTableIdParams,
   asyncHandler(controller.getTableById),
 );
 router.get(
   "/branches/:branchId/tables/available",
-  validateBranchIdParams,
+  floorTableValidator.validateBranchIdParams,
   asyncHandler(controller.getAvailableTablesByBranch),
 );
 router.patch(
   "/tables/:tableId/status",
-  validateUpdateTableStatus,
+  floorTableValidator.validateUpdateTableStatus,
   asyncHandler(controller.updateTableStatus),
 );
 
