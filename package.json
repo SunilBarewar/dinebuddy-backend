@@ -49,6 +49,9 @@
     "@prisma/adapter-pg": "^7.4.0",
     "@prisma/client": "^7.4.0",
     "express": "^5.2.1",
-    "pg": "^8.18.0"
+    "http-status": "^2.1.0",
+    "pg": "^8.18.0",
+    "zod": "^4.3.6",
+    "zod-express-validator": "^0.0.6"
   }
 }

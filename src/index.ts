@@ -4,6 +4,10 @@ import express, {
   type NextFunction,
 } from "express";
 
+import { HttpError } from "@/exceptions/http-error";
+import adminFloorTableRouter from "@/routes/admin/admin-floor-table.routes";
+import userFloorTableRouter from "@/routes/floor-table.routes";
+
 const app = express();
 const PORT = process.env.PORT ?? 3000;
 
@@ -29,6 +33,9 @@ app.get("/health", (_req: Request, res: Response) => {
   });
 });
 
+app.use("/api/v1/admin", adminFloorTableRouter);
+app.use("/api/v1", userFloorTableRouter);
+
 // 404 handler
 app.use((req: Request, res: Response) => {
   res.status(404).json({
@@ -41,6 +48,15 @@ app.use((req: Request, res: Response) => {
 // Error handler
 app.use((err: Error, _req: Request, res: Response, _next: NextFunction) => {
   console.error(err.stack);
+
+  if (err instanceof HttpError) {
+    res.status(err.statusCode).json({
+      message: err.message,
+      status: "error",
+    });
+
+    return;
+  }
 
   res.status(500).json({
     message: "Internal server error",
