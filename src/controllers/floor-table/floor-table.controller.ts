@@ -1,107 +1,93 @@
-import type { Request, Response } from "express";
-
 import { FloorTableService } from "@/services/floor-table.service";
-import type {
-  TBranchIdParams,
-  TFloorIdParams,
-  TTableIdParams,
-  TUpdateTableStatusBody,
-} from "@/validators/floor-table.validator";
+import httpStatus from "http-status";
+import { sendSuccessResponse } from "@/utils/response-formatter";
+import type { TUserFloorTableController as TController } from "@/validators/floor-table.validator";
 
 export class FloorTableController {
-  private static instance: FloorTableController;
+  private static instance: FloorTableController | null = null;
 
   private readonly service = new FloorTableService();
 
   private constructor() {}
 
   public static getInstance(): FloorTableController {
-    if (!FloorTableController.instance) {
-      FloorTableController.instance = new FloorTableController();
-    }
+    const instance = (FloorTableController.instance ??=
+      new FloorTableController());
 
-    return FloorTableController.instance;
+    return instance;
   }
 
-  public getFloorsByBranch = async (
-    req: Request,
-    res: Response,
-  ): Promise<void> => {
-    const { branchId } = req.params as TBranchIdParams;
+  public getFloorsByBranch: TController["getFloorsByBranch"] = async (
+    req,
+    res,
+  ) => {
+    const { branchId } = req.params;
     const floors = await this.service.getFloorsByBranch(branchId);
 
-    res.json({
+    sendSuccessResponse(res, httpStatus.OK, {
       data: floors,
       message: "Floors fetched successfully",
-      status: "success",
     });
   };
 
-  public getTablesByFloor = async (
-    req: Request,
-    res: Response,
-  ): Promise<void> => {
-    const { floorId } = req.params as TFloorIdParams;
+  public getTablesByFloor: TController["getTablesByFloor"] = async (
+    req,
+    res,
+  ) => {
+    const { floorId } = req.params;
     const tables = await this.service.getTablesByFloor(floorId);
 
-    res.json({
+    sendSuccessResponse(res, httpStatus.OK, {
       data: tables,
       message: "Tables fetched successfully",
-      status: "success",
     });
   };
 
-  public getBranchFloorPlan = async (
-    req: Request,
-    res: Response,
-  ): Promise<void> => {
-    const { branchId } = req.params as TBranchIdParams;
+  public getBranchFloorPlan: TController["getBranchFloorPlan"] = async (
+    req,
+    res,
+  ) => {
+    const { branchId } = req.params;
     const floorPlan = await this.service.getBranchFloorPlan(branchId);
 
-    res.json({
+    return sendSuccessResponse(res, httpStatus.OK, {
       data: floorPlan,
       message: "Branch floor plan fetched successfully",
-      status: "success",
     });
   };
 
-  public getTableById = async (req: Request, res: Response): Promise<void> => {
-    const { tableId } = req.params as TTableIdParams;
+  public getTableById: TController["getTableById"] = async (req, res) => {
+    const { tableId } = req.params;
     const table = await this.service.getTableById(tableId);
 
-    res.json({
+    sendSuccessResponse(res, httpStatus.OK, {
       data: table,
       message: "Table fetched successfully",
-      status: "success",
     });
   };
 
-  public getAvailableTablesByBranch = async (
-    req: Request,
-    res: Response,
-  ): Promise<void> => {
-    const { branchId } = req.params as TBranchIdParams;
-    const tables = await this.service.getAvailableTablesByBranch(branchId);
+  public getAvailableTablesByBranch: TController["getAvailableTablesByBranch"] =
+    async (req, res) => {
+      const { branchId } = req.params;
+      const tables = await this.service.getAvailableTablesByBranch(branchId);
 
-    res.json({
-      data: tables,
-      message: "Available tables fetched successfully",
-      status: "success",
-    });
-  };
+      return sendSuccessResponse(res, httpStatus.OK, {
+        data: tables,
+        message: "Available tables fetched successfully",
+      });
+    };
 
-  public updateTableStatus = async (
-    req: Request,
-    res: Response,
-  ): Promise<void> => {
-    const { tableId } = req.params as TTableIdParams;
-    const { status } = req.body as TUpdateTableStatusBody;
+  public updateTableStatus: TController["updateTableStatus"] = async (
+    req,
+    res,
+  ) => {
+    const { tableId } = req.params;
+    const { status } = req.body;
     const table = await this.service.updateTableStatus(tableId, status);
 
-    res.json({
+    return sendSuccessResponse(res, httpStatus.OK, {
       data: table,
       message: "Table status updated successfully",
-      status: "success",
     });
   };
 }

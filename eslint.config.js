@@ -3,6 +3,9 @@ import perfectionist from "eslint-plugin-perfectionist";
 import { defineConfig } from "eslint/config";
 import tseslint from "typescript-eslint";
 import globals from "globals";
+import { createRequire } from 'module';
+
+const require = createRequire(import.meta.url);
 
 export default defineConfig(
   // Ignore patterns
@@ -87,13 +90,17 @@ export default defineConfig(
           selector: "interface",
           format: ["PascalCase"],
           custom: {
-            regex: "^I[A-Z]",
-            match: false,
+            regex: "^I[A-Z][a-zA-Z0-9]*$",
+            match: true,
           },
         },
         {
           selector: "typeAlias",
           format: ["PascalCase"],
+          custom: {
+            regex: "^T[A-Z][a-zA-Z0-9]*$",
+            match: true,
+          },
         },
         {
           selector: "enum",

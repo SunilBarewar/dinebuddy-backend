@@ -1,6 +1,6 @@
 import { Router } from "express";
 
-import { AdminFloorTableController } from "@/controllers/floor-table/admin-floor-table.controller";
+import { AdminFloorTableController } from "@/controllers/floor-table";
 import { asyncHandler } from "@/utils/async-handler";
 import { floorTableValidator } from "@/validators/floor-table.validator";
 

@@ -1,38 +1,23 @@
-import type { Request, Response } from "express";
-
 import { FloorTableService } from "@/services/floor-table.service";
-import type {
-  TAdminFloorTableController,
-  TBranchIdParams,
-  TCreateTableBody,
-  TFloorIdParams,
-  TReorderFloorsBody,
-  TTableIdParams,
-  TUpdateFloorBody,
-  TUpdateFloorLayoutBody,
-  TUpdateTableBody,
-  TUpdateTableStatusBody,
-} from "@/validators/floor-table.validator";
+import { sendSuccessResponse } from "@/utils/response-formatter";
+import httpStatus from "http-status";
+import type { TAdminFloorTableController as TController } from "@/validators/floor-table.validator";
 
 export class AdminFloorTableController {
-  private static instance: AdminFloorTableController;
+  private static instance: AdminFloorTableController | null = null;
 
   private readonly service = new FloorTableService();
 
   private constructor() {}
 
   public static getInstance(): AdminFloorTableController {
-    if (!AdminFloorTableController.instance) {
-      AdminFloorTableController.instance = new AdminFloorTableController();
-    }
+    const instance = (AdminFloorTableController.instance ??=
+      new AdminFloorTableController());
 
-    return AdminFloorTableController.instance;
+    return instance;
   }
 
-  public createFloor: TAdminFloorTableController["createFloor"] = async (
-    req,
-    res,
-  ): Promise<void> => {
+  public createFloor: TController["createFloor"] = async (req, res) => {
     const { branchId } = req.params;
     const { displayOrder, name } = req.body;
 
@@ -42,75 +27,70 @@ export class AdminFloorTableController {
       name,
     });
 
-    res.status(201).json({
+    sendSuccessResponse(res, httpStatus.CREATED, {
       data: floor,
       message: "Floor created successfully",
-      status: "success",
     });
   };
 
-  public getFloorsByBranch: TAdminFloorTableController["getFloorsByBranch"] =
-    async (req, res): Promise<void> => {
-      const { branchId } = req.params;
-      const floors = await this.service.getFloorsByBranch(branchId);
+  public getFloorsByBranch: TController["getFloorsByBranch"] = async (
+    req,
+    res,
+  ) => {
+    const { branchId } = req.params;
+    const floors = await this.service.getFloorsByBranch(branchId);
 
-      res.json({
-        data: floors,
-        message: "Floors fetched successfully",
-        status: "success",
-      });
-    };
+    sendSuccessResponse(res, 200, {
+      data: floors,
+      message: "Floors fetched successfully",
+    });
+  };
 
-  public getFloorById = async (req: Request, res: Response): Promise<void> => {
-    const { floorId } = req.params as TFloorIdParams;
+  public getFloorById: TController["getFloorById"] = async (req, res) => {
+    const { floorId } = req.params;
     const floor = await this.service.getFloorById(floorId);
 
-    res.json({
+    sendSuccessResponse(res, httpStatus.OK, {
       data: floor,
       message: "Floor fetched successfully",
-      status: "success",
     });
   };
 
-  public updateFloor = async (req: Request, res: Response): Promise<void> => {
-    const { floorId } = req.params as TFloorIdParams;
-    const payload = req.body as TUpdateFloorBody;
+  public updateFloor: TController["updateFloor"] = async (req, res) => {
+    const { floorId } = req.params;
+    const payload = req.body;
     const floor = await this.service.updateFloor(floorId, payload);
 
-    res.json({
+    sendSuccessResponse(res, 200, {
       data: floor,
       message: "Floor updated successfully",
-      status: "success",
     });
   };
 
-  public deleteFloor = async (req: Request, res: Response): Promise<void> => {
-    const { floorId } = req.params as TFloorIdParams;
+  public deleteFloor: TController["deleteFloor"] = async (req, res) => {
+    const { floorId } = req.params;
 
     await this.service.deleteFloor(floorId);
 
-    res.json({
+    sendSuccessResponse(res, httpStatus.OK, {
       message: "Floor deleted successfully",
-      status: "success",
     });
   };
 
-  public reorderFloors = async (req: Request, res: Response): Promise<void> => {
-    const { branchId } = req.params as TBranchIdParams;
-    const { items } = req.body as TReorderFloorsBody;
+  public reorderFloors: TController["reorderFloors"] = async (req, res) => {
+    const { branchId } = req.params;
+    const { items } = req.body;
     const floors = await this.service.reorderFloors(branchId, items);
 
-    res.json({
+    sendSuccessResponse(res, httpStatus.OK, {
       data: floors,
       message: "Floors reordered successfully",
-      status: "success",
     });
   };
 
-  public createTable = async (req: Request, res: Response): Promise<void> => {
-    const { floorId } = req.params as TFloorIdParams;
-    const { branchId, posX, posY, shape, status, tableNumber } =
-      req.body as TCreateTableBody;
+  public createTable: TController["createTable"] = async (req, res) => {
+    const { floorId } = req.params;
+    const { branchId, posX, posY, shape, status, tableNumber } = req.body;
 
     const table = await this.service.createTable({
       branchId,
@@ -122,88 +102,84 @@ export class AdminFloorTableController {
       tableNumber,
     });
 
-    res.status(201).json({
+    sendSuccessResponse(res, httpStatus.CREATED, {
       data: table,
       message: "Table created successfully",
-      status: "success",
     });
   };
 
-  public getTablesByFloor = async (
-    req: Request,
-    res: Response,
+  public getTablesByFloor: TController["getTablesByFloor"] = async (
+    req,
+    res,
   ): Promise<void> => {
-    const { floorId } = req.params as TFloorIdParams;
+    const { floorId } = req.params;
     const tables = await this.service.getTablesByFloor(floorId);
 
-    res.json({
+    sendSuccessResponse(res, httpStatus.OK, {
       data: tables,
       message: "Tables fetched successfully",
-      status: "success",
     });
   };
 
-  public getTableById = async (req: Request, res: Response): Promise<void> => {
-    const { tableId } = req.params as TTableIdParams;
+  public getTableById: TController["getTableById"] = async (
+    req,
+    res,
+  ): Promise<void> => {
+    const { tableId } = req.params;
     const table = await this.service.getTableById(tableId);
 
-    res.json({
+    sendSuccessResponse(res, httpStatus.OK, {
       data: table,
       message: "Table fetched successfully",
-      status: "success",
     });
   };
 
-  public updateTable = async (req: Request, res: Response): Promise<void> => {
-    const { tableId } = req.params as TTableIdParams;
-    const payload = req.body as TUpdateTableBody;
+  public updateTable: TController["updateTable"] = async (req, res) => {
+    const { tableId } = req.params;
+    const payload = req.body;
     const table = await this.service.updateTable(tableId, payload);
 
-    res.json({
+    return sendSuccessResponse(res, httpStatus.OK, {
       data: table,
       message: "Table updated successfully",
-      status: "success",
     });
   };
 
-  public deleteTable = async (req: Request, res: Response): Promise<void> => {
-    const { tableId } = req.params as TTableIdParams;
+  public deleteTable: TController["deleteTable"] = async (req, res) => {
+    const { tableId } = req.params;
 
     await this.service.deleteTable(tableId);
 
-    res.json({
+    sendSuccessResponse(res, httpStatus.OK, {
       message: "Table deleted successfully",
-      status: "success",
     });
   };
 
-  public updateTableStatus = async (
-    req: Request,
-    res: Response,
-  ): Promise<void> => {
-    const { tableId } = req.params as TTableIdParams;
-    const { status } = req.body as TUpdateTableStatusBody;
+  public updateTableStatus: TController["updateTableStatus"] = async (
+    req,
+    res,
+  ) => {
+    const { tableId } = req.params;
+    const { status } = req.body;
     const table = await this.service.updateTableStatus(tableId, status);
 
-    res.json({
+    return sendSuccessResponse(res, httpStatus.OK, {
       data: table,
       message: "Table status updated successfully",
-      status: "success",
     });
   };
 
-  public updateFloorLayout = async (
-    req: Request,
-    res: Response,
-  ): Promise<void> => {
-    const { floorId } = req.params as TFloorIdParams;
-    const { items } = req.body as TUpdateFloorLayoutBody;
+  public updateFloorLayout: TController["updateFloorLayout"] = async (
+    req,
+    res,
+  ) => {
+    const { floorId } = req.params;
+    const { items } = req.body;
     const tables = await this.service.updateFloorLayout(floorId, items);
 
-    res.json({
+    return sendSuccessResponse(res, httpStatus.OK, {
       data: tables,
       message: "Floor layout updated successfully",
-      status: "success",
     });
   };
 }

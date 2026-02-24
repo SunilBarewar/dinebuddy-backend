@@ -19,7 +19,8 @@
     "db:migrate:create": "prisma migrate dev --create-only",
     "db:push": "prisma db push",
     "db:studio": "prisma studio",
-    "db:deploy": "prisma migrate deploy"
+    "db:deploy": "prisma migrate deploy",
+    "db:seed": "tsx prisma/seeders/floor-table.ts"
   },
   "keywords": [
     "express",
@@ -28,6 +29,9 @@
     "backend",
     "api"
   ],
+  "prisma": {
+    "seed": "tsx prisma/seeders/floor-table.ts"
+  },
   "author": "",
   "license": "ISC",
   "devDependencies": {

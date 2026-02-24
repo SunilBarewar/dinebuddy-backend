@@ -3,6 +3,7 @@ import type { NextFunction, Request, Response } from "express";
 import env from "@/config/env";
 import { HttpError } from "@/exceptions/http-error";
 import logger from "@/lib/logger";
+import { sendErrorResponse } from "@/utils/response-formatter";
 
 const isDev = env.NODE_ENV !== "production";
 
@@ -11,11 +12,8 @@ const isDev = env.NODE_ENV !== "production";
  * Mounted AFTER all routes. Any request that reaches here matched nothing.
  */
 export function notFoundHandler(req: Request, res: Response): void {
-  res.status(404).json({
-    status: "error",
-    statusCode: 404,
+  sendErrorResponse(res, 404, {
     message: `Cannot ${req.method} ${req.path}`,
-    timestamp: new Date().toISOString(),
   });
 }
 
@@ -36,11 +34,8 @@ export function globalErrorHandler(
    * Operational errors (expected, thrown intentionally)
    */
   if (err instanceof HttpError) {
-    res.status(err.statusCode).json({
-      status: "error",
-      statusCode: err.statusCode,
+    sendErrorResponse(res, err.statusCode, {
       message: err.message,
-      timestamp: new Date().toISOString(),
       ...(isDev && { stack: err.stack }),
     });
 
@@ -54,11 +49,8 @@ export function globalErrorHandler(
 
   logger.error("[GlobalErrorHandler] Unexpected error", { error: err });
 
-  res.status(500).json({
-    status: "error",
-    statusCode: 500,
+  sendErrorResponse(res, 500, {
     message: "An unexpected error occurred. Please try again later.",
-    timestamp: new Date().toISOString(),
     ...(isDev && { error: err.message, stack: err.stack }),
   });
 }
