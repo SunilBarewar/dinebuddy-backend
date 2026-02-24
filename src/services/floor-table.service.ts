@@ -218,5 +218,3 @@ export class FloorTableService {
     return this.repository.floorTable.findAvailableTablesByBranchId(branchId);
   }
 }
-
-export const floorTableService = new FloorTableService();
