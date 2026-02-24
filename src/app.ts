@@ -1,6 +1,6 @@
 import express, { type Request, type Response } from "express";
 import helmet from "helmet";
-
+import * as HyperDX from "@hyperdx/node-opentelemetry";
 import env from "@/config/env";
 
 import { compressionMiddleware } from "@/middleware/compression.middleware";
@@ -59,6 +59,10 @@ export function createApp(): express.Application {
   });
 
   app.use("/api/v1", apiRouter);
+
+  if (env.HYPERDX_API_KEY) {
+    HyperDX.setupExpressErrorHandler(app);
+  }
 
   app.use(notFoundHandler);
 

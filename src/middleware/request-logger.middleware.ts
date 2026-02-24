@@ -1,18 +1,26 @@
 import morgan from "morgan";
 
 import env from "@/config/env";
+import logger from "@/lib/logger";
 
 /**
- * Uses "dev" (coloured, concise) format in development for quick readability,
- * and "combined" (Apache-style, structured) in production for log aggregators
- * like Datadog, New Relic, or AWS CloudWatch.
+ * Pipes Morgan HTTP request logs through Winston so every request line is
+ * captured by all active transports (console + HyperDX).
+ *
+ * Format:
+ *  - "dev"      – coloured, concise format in development for quick readability
+ *  - "combined" – Apache-style structured format in production for log aggregators
  */
 const requestLoggerMiddleware = morgan(
   env.NODE_ENV === "production" ? "combined" : "dev",
   {
+    // Route Morgan output through Winston instead of stdout
+    stream: {
+      write: (message: string) =>
+        logger.http(message.trimEnd(), { context: "HTTP" }),
+    },
+
     // Skip health-check probes to keep logs clean in production.
-    // Morgan's skip callback receives http.IncomingMessage (not Express Request),
-    // so we access the url property and check for the health path.
     skip(req) {
       return (req.url ?? "").startsWith("/health");
     },

@@ -2,6 +2,7 @@ import type { NextFunction, Request, Response } from "express";
 
 import env from "@/config/env";
 import { HttpError } from "@/exceptions/http-error";
+import logger from "@/lib/logger";
 
 const isDev = env.NODE_ENV !== "production";
 
@@ -51,8 +52,7 @@ export function globalErrorHandler(
    * Never leak error details or stack traces to the client in production.
    */
 
-  // eslint-disable-next-line no-console
-  console.error("[GlobalErrorHandler] Unexpected error:", err);
+  logger.error("[GlobalErrorHandler] Unexpected error", { error: err });
 
   res.status(500).json({
     status: "error",

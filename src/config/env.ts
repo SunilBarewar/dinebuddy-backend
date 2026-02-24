@@ -14,8 +14,13 @@ const EnvSchema = z.object({
   DATABASE_URL: z.string().min(1, "DATABASE_URL is required"),
 
   // CORS
-
   ALLOWED_ORIGINS: z.string().optional(),
+
+  // Observability
+  HYPERDX_API_KEY: z.string().optional(),
+  LOG_LEVEL: z
+    .enum(["error", "warn", "info", "http", "verbose", "debug", "silly"])
+    .optional(),
 });
 
 const parsed = EnvSchema.safeParse(process.env);
